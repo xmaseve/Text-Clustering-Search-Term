@@ -8,7 +8,8 @@ Created on Mon Sep 05 20:29:46 2016
 import pandas as pd
 from nltk.corpus import stopwords
 import re
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.cluster import KMeans
+
 
 searchterm = pd.read_csv('C:\Users\YI\Desktop\search term.csv')
 searchterm.head()
@@ -47,23 +48,23 @@ def createMatrix(data, vocablist):
     return mat
 
 vocabList = createVocabList(cleantext) 
-'''
-vectorizer = CountVectorizer(analyzer = "word",   \
-                             tokenizer = None,    \
-                             preprocessor = None, \
-                             stop_words = None,   \
-                             max_features = 5000) 
+mat = createMatrix(cleantext,vocabList)
 
-data_features = vectorizer.fit_transform(vocabList)
-data_features = data_features.toarray()
-vocab = vectorizer.get_feature_names()
-print vocab
+def kmeans(k):
+    kmeans_clustering = KMeans(n_clusters = k)
+    idx = kmeans_clustering.fit_predict(mat)
+    word_centroid_map = dict(zip( vocabList, idx ))
+    for cluster in xrange(0,k):
+    #
+    # Print the cluster number  
+        print "\nCluster %d" % cluster
+    #
+    # Find all of the words for that cluster number, and print them out
+        words = []
+        for i in xrange(0,len(word_centroid_map.values())):
+            if( word_centroid_map.values()[i] == cluster ):
+                words.append(word_centroid_map.keys()[i])
+        print words
 
-# Sum up the counts of each vocabulary word
-dist = np.sum(data_features, axis=0)
 
-# For each, print the vocabulary word and the number of times it 
-# appears in the training set
-for tag, count in zip(vocab, dist):
-    print count, tag
-'''
+
